@@ -138,7 +138,7 @@ class MyPanel(wx.Panel):
         # self.get_activeWindows=Timer_activeWindow(self)
 
 
-        #fetching windows url
+        # #fetching windows url
         # self.urlFetching=wx.Timer(self)
         # self.Bind(wx.EVT_TIMER,get_url_window,self.urlFetching)
         # self.urlFetching.Start(5000)

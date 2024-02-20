@@ -83,7 +83,7 @@ def get_url_window(e):
     app = Application(backend="uia").connect(process=pid, time_out=10)
 
     # app.NewTabGoogleChrome.print_control_identifiers()
-    app.NewTabBrave.print_control_identifiers()
+    # app.NewTabBrave.print_control_identifiers()
     # app.NewtabProfile1MicrosoftEdge.print_control_identifiers()
     # app.GoogleProfile1MicrosoftEdge.print_control_identifiers()
 
@@ -96,7 +96,7 @@ def get_url_window(e):
     for title in possible_titles:
         for control_type in possible_control_types:
             try:
-                url_control = dlg.child_window( control_type=control_type, auto_id = "view_1022")
+                url_control = dlg.child_window(title=title, control_type=control_type, auto_id = "view_1022")
                 if url_control.exists():
                     url = url_control.get_value()
                     if url:
@@ -177,7 +177,7 @@ class MyPanel(wx.Panel):
         # self.timer_activewindow.Start(5000)
 
         '''breaking down above thing to new component'''
-        self.get_activeWindows=Timer_activeWindow(self)
+        # self.get_activeWindows=Timer_activeWindow(self)
 
 
         #fetching windows url
