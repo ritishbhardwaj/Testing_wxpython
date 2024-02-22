@@ -2,6 +2,7 @@
    |    |    | ['Edit2']
    |    |    | child_window(title="Search with Google or enter address", auto_id="urlbar-input", control_type="Edit")'''
 
+import os
 from win32gui import GetForegroundWindow , GetWindowText
 from win32process import GetWindowThreadProcessId
 from pywinauto.application import Application
@@ -11,6 +12,8 @@ import pyscreenshot
 import pygetwindow as pyg
 import logging
 import datetime
+
+from pluginbase import PluginBase
 
 '''Creating root logger'''
 
@@ -49,12 +52,12 @@ def get_url_window(e):
     window = GetForegroundWindow()
     print("Window" , window)
     Text= GetWindowText(window)
-    # print(Text)
+    print(Text)
 
     l1=Text.split(' - ')
     l2=Text.split(' — ')
-    print("l1===========",l1)
-    print("=========l2",l2)
+    # print("l1===========",l1)
+    # print("=========l2",l2)
 
     final_lst = l1 if len(l1) > len(l2) else l2
 
@@ -67,6 +70,7 @@ def get_url_window(e):
     except Exception as e:
         pass
 
+        print(app)
     # app.NewTabGoogleChrome.print_control_identifiers()
     # app.NewtabProfile1MicrosoftEdge.print_control_identifiers()
     # app.GoogleProfile1MicrosoftEdge.print_control_identifiers()
@@ -74,6 +78,8 @@ def get_url_window(e):
     # app.MozillaFirefox.print_control_identifiers()
     # app.NewTabBrave.print_control_identifiers()
     # app.NewIncognitotabGoogleChrome.print_control_identifiers()
+    # app.PluginBasepluginbaseGoogleChrome.print_control_identifiers()
+    
 
     
     url=None
@@ -107,16 +113,17 @@ def get_url_window(e):
     print()
     
 
-def collect_activeWindows(event):
-    window :str  =pyg.getActiveWindowTitle()
+# def collect_activeWindows(event,fa):
+#     window :str  =pyg.getActiveWindowTitle()
 
-    aa= pyg.getActiveWindow()
-    print(dir(aa),"<----------------------------------")
+#     # aa= pyg.getActiveWindow()
+#     # print(dir(aa),"<----------------------------------")
 
-    # aawnd = pyg.getWindowsWithTitle(window)
-    # print(aawnd[0]._hWnd,'-=-=-=-=-=-=-=-=-=-=-=')
-    # print(window,'-----=-=-=-=-=-=-=-=-=-=-=')
-    logger.info(f" active window of user - {window}")
+#     # aawnd = pyg.getWindowsWithTitle(window)
+#     # print(aawnd[0]._hWnd,'-=-=-=-=-=-=-=-=-=-=-=')
+#     # print(window,'-----=-=-=-=-=-=-=-=-=-=-=')
+#     print(window)
+#     logger.info(f" active window of user - {window}")
     
 
 class MyPanel(wx.Panel):
@@ -126,31 +133,66 @@ class MyPanel(wx.Panel):
 
         parent.CreateStatusBar()
 
+        #Connecting Plugins
+        self.initialize_plugins()
+
         '''taking ScreenShots'''
         # self.take_ss=Timer_ss(self)
         
         '''Colleccting Active windows'''
-        self.get_activeWindows=Timer_activeWindow(self)
+        # self.get_activeWindows=Timer_activeWindow(self)
 
         '''Collecting Urls'''
         # self.take_ulr = Url_FetchingWindow(self)
 
 
+    def initialize_plugins(self):
+
+        plugin_base = PluginBase(package= 'Myplugins')   # the name of this package can be different from the real folder name 
+                                                        # like here the name of the folder is plugins and i have put Myplugins in package name 
+                                                            # basically this is the namespace that we are creating under which all my plugins will reside
+        
+        self.plugins  = plugin_base.make_plugin_source(
+            searchpath = [os.path.join(os.path.abspath(os.path.dirname(__file__)),".\plugins"),
+                          os.path.join(os.path.abspath(os.path.dirname(__file__)),"plugins")]
+        )
+
+        plugin  =  self.plugins.load_plugin("windowTitle")    # !!! IMPORTANT to note that we don't add .py in the name of the plugin
+
+        print(plugin)
+
+        # self.take_ulr = Timer_activeWindow(self,plugin)
+        self.get_activeWindows=Timer_activeWindow(self,plugin)
+        
+
+
+
+
+
 
 class Url_FetchingWindow(wx.Timer):
     
-    def __init__(self,parent:MyPanel):
+    def __init__(self,parent:MyPanel, plugin):
 
         super().__init__(parent)
+        # parent.Bind(wx.EVT_TIMER,get_url_window,self)
         parent.Bind(wx.EVT_TIMER,get_url_window,self)
         self.Start(3000)
 
 class Timer_activeWindow(wx.Timer):
 
-    def __init__(self,parent:MyPanel):
+    def __init__(self,parent:MyPanel,plugin):
         
         super().__init__(parent)
-        parent.Bind(wx.EVT_TIMER,collect_activeWindows,self)
+        fake_argument = "hello Worlds"
+        '''This syntax works '''
+        parent.Bind(wx.EVT_TIMER, plugin.collect_activeWindows,self)
+
+        '''This syntax works too'''
+        # parent.Bind(wx.EVT_TIMER,lambda event : plugin.collect_activeWindows(event))
+
+        '''old syntax when i haven't built plugins'''
+        # parent.Bind(wx.EVT_TIMER,lambda event : collect_activeWindows(event , fake_argument),self)
         self.Start(5000)
 
 class Timer_ss(wx.Timer):
