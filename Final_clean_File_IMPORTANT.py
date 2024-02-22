@@ -47,70 +47,70 @@ def screenshot(event):
     # print(f"screen shot {i-1} taken")
 
 
-def get_url_window(e):
+# def get_url_window(e):
 
-    window = GetForegroundWindow()
-    print("Window" , window)
-    Text= GetWindowText(window)
-    print(Text)
+#     window = GetForegroundWindow()
+#     print("Window" , window)
+#     Text= GetWindowText(window)
+#     print(Text)
 
-    l1=Text.split(' - ')
-    l2=Text.split(' — ')
-    # print("l1===========",l1)
-    # print("=========l2",l2)
+#     l1=Text.split(' - ')
+#     l2=Text.split(' — ')
+#     # print("l1===========",l1)
+#     # print("=========l2",l2)
 
-    final_lst = l1 if len(l1) > len(l2) else l2
+#     final_lst = l1 if len(l1) > len(l2) else l2
 
-    tid, pid = GetWindowThreadProcessId(window)
-    # print(pid)
+#     tid, pid = GetWindowThreadProcessId(window)
+#     # print(pid)
 
-    try:
-        app = Application(backend="uia").connect(process=pid, time_out=10)
-        dlg = app.top_window()
-    except Exception as e:
-        pass
+#     try:
+#         app = Application(backend="uia").connect(process=pid, time_out=10)
+#         dlg = app.top_window()
+#     except Exception as e:
+#         pass
 
-        print(app)
-    # app.NewTabGoogleChrome.print_control_identifiers()
-    # app.NewtabProfile1MicrosoftEdge.print_control_identifiers()
-    # app.GoogleProfile1MicrosoftEdge.print_control_identifiers()
-    # app.MozillaFirefoxPrivateBrowsing.print_control_identifiers()
-    # app.MozillaFirefox.print_control_identifiers()
-    # app.NewTabBrave.print_control_identifiers()
-    # app.NewIncognitotabGoogleChrome.print_control_identifiers()
-    # app.PluginBasepluginbaseGoogleChrome.print_control_identifiers()
+#         print(app)
+#     # app.NewTabGoogleChrome.print_control_identifiers()
+#     # app.NewtabProfile1MicrosoftEdge.print_control_identifiers()
+#     # app.GoogleProfile1MicrosoftEdge.print_control_identifiers()
+#     # app.MozillaFirefoxPrivateBrowsing.print_control_identifiers()
+#     # app.MozillaFirefox.print_control_identifiers()
+#     # app.NewTabBrave.print_control_identifiers()
+#     # app.NewIncognitotabGoogleChrome.print_control_identifiers()
+#     # app.PluginBasepluginbaseGoogleChrome.print_control_identifiers()
     
 
     
-    url=None
-    title = "Address and search bar"
-    if 'Microsoft\u200b Edge' in final_lst:
-        try: # Microsoft Browser Specific
-            url = dlg.child_window(  auto_id = "view_1022",control_type="Edit" ).get_value()
-            print("URL================> ", url)
-            # logger.info(f"incoming URL------{url}")
-        except Exception as e:
-            pass
+#     url=None
+#     title = "Address and search bar"
+#     if 'Microsoft\u200b Edge' in final_lst:
+#         try: # Microsoft Browser Specific
+#             url = dlg.child_window(  auto_id = "view_1022",control_type="Edit" ).get_value()
+#             print("URL================> ", url)
+#             # logger.info(f"incoming URL------{url}")
+#         except Exception as e:
+#             pass
 
-    elif ('Brave' in final_lst)  or ('Google Chrome' in final_lst) :
-        try:  # for Chrome and Brave Specific
-            url = dlg.child_window(title=title, control_type = "Edit").get_value()
-            print("URL================> ",url)
-            logger.info(f"incoming URL------{url}")
-        except Exception as e:
-            pass
+#     elif ('Brave' in final_lst)  or ('Google Chrome' in final_lst) :
+#         try:  # for Chrome and Brave Specific
+#             url = dlg.child_window(title=title, control_type = "Edit").get_value()
+#             print("URL================> ",url)
+#             logger.info(f"incoming URL------{url}")
+#         except Exception as e:
+#             pass
 
-    elif 'Mozilla Firefox' in final_lst or 'Mozilla Firefox Private Browsing' in final_lst:
-        try:    # for Firefox specific
-            url= dlg.child_window( auto_id="urlbar-input", control_type="Edit").get_value()
-            print("URL==============>",url)
+#     elif 'Mozilla Firefox' in final_lst or 'Mozilla Firefox Private Browsing' in final_lst:
+#         try:    # for Firefox specific
+#             url= dlg.child_window( auto_id="urlbar-input", control_type="Edit").get_value()
+#             print("URL==============>",url)
     
-        except Exception as e:
-            pass
+#         except Exception as e:
+#             pass
 
-    if url==None:
-        print("No url Found")        
-    print()
+#     if url==None:
+#         print("No url Found")        
+#     print()
     
 
 # def collect_activeWindows(event,fa):
@@ -158,15 +158,13 @@ class MyPanel(wx.Panel):
         )
 
         plugin  =  self.plugins.load_plugin("windowTitle")    # !!! IMPORTANT to note that we don't add .py in the name of the plugin
+        plugin1  =  self.plugins.load_plugin("url_grabbing")
 
-        print(plugin)
+        print(plugin1)
 
-        # self.take_ulr = Timer_activeWindow(self,plugin)
+        self.take_ulr = Url_FetchingWindow(self,plugin1)
         self.get_activeWindows=Timer_activeWindow(self,plugin)
         
-
-
-
 
 
 
@@ -176,8 +174,8 @@ class Url_FetchingWindow(wx.Timer):
 
         super().__init__(parent)
         # parent.Bind(wx.EVT_TIMER,get_url_window,self)
-        parent.Bind(wx.EVT_TIMER,get_url_window,self)
-        self.Start(3000)
+        parent.Bind(wx.EVT_TIMER,plugin.get_url_window,self)
+        self.Start(5000)
 
 class Timer_activeWindow(wx.Timer):
 
@@ -193,6 +191,7 @@ class Timer_activeWindow(wx.Timer):
 
         '''old syntax when i haven't built plugins'''
         # parent.Bind(wx.EVT_TIMER,lambda event : collect_activeWindows(event , fake_argument),self)
+
         self.Start(5000)
 
 class Timer_ss(wx.Timer):
