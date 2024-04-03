@@ -3,47 +3,56 @@
    |    |    | child_window(title="Search with Google or enter address", auto_id="urlbar-input", control_type="Edit")'''
 
 import os
-from win32gui import GetForegroundWindow , GetWindowText
-from win32process import GetWindowThreadProcessId
-from pywinauto.application import Application
+import asyncio
+# from win32gui import GetForegroundWindow , GetWindowText
+# from win32process import GetWindowThreadProcessId
+# from pywinauto.application import Application
 
 import wx
-import pyscreenshot
 import pygetwindow as pyg
-import logging
-import datetime
+# import logging
+# import datetime
+from win32gui import GetForegroundWindow , GetWindowText
+from win32process import GetWindowThreadProcessId
+# from pywinauto.application import Application
+# import pyscreenshot
+# import threading
+
+import sqlite3
+
 
 from pluginbase import PluginBase
+import os
 
-'''Creating root logger'''
+# '''Creating root logger'''
 
-logger=logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
+# logger=logging.getLogger(__name__)
+# logger.setLevel(logging.DEBUG)
 
-formatting=logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
-file_handler=logging.FileHandler('log_files\demo_ss4.log')
-file_handler.setFormatter(formatting)
+# formatting=logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
+# file_handler=logging.FileHandler(os.path.join(os.path.abspath(os.path.dirname(__file__)),'log_files/'))
+# file_handler.setFormatter(formatting)
 
-logger.addHandler(file_handler)
+# logger.addHandler(file_handler)
 
-'''Creating root logger Ends'''
-
-
-logger.debug(f"################  Start of the program at - {datetime.datetime.now()} ############################")
+# '''Creating root logger Ends'''
 
 
+# logger.debug(f"################  Start of the program at - {datetime.datetime.now()} ############################")
 
-i=1
-def screenshot(event):
-    global i
-    im=pyscreenshot.grab()
-    image_ss_name=f'screenshot_no.{i}'
-    i+=1
-    image_path=f'.\dummy_ss\{image_ss_name}.png'
 
-    im.save(image_path)
 
-    logger.info(f"screen shot {i-1} taken")
+# i=1
+# def screenshot(event):
+#     global i
+#     im=pyscreenshot.grab()
+#     image_ss_name=f'screenshot_no.{i}'
+#     i+=1
+#     image_path=f'.\dummy_ss\{image_ss_name}.png'
+
+#     im.save(image_path)
+
+#     logger.info(f"screen shot {i-1} taken")
     # print(f"screen shot {i-1} taken")
 
 
@@ -159,11 +168,14 @@ class MyPanel(wx.Panel):
 
         plugin  =  self.plugins.load_plugin("windowTitle")    # !!! IMPORTANT to note that we don't add .py in the name of the plugin
         plugin1  =  self.plugins.load_plugin("url_grabbing")
-
+        plugin2= self.plugins.load_plugin("ScreenGrab")
+        print()
         print(plugin1)
 
-        self.take_ulr = Url_FetchingWindow(self,plugin1)
+        self.take_url =Url_FetchingWindow(self,plugin1)
         self.get_activeWindows=Timer_activeWindow(self,plugin)
+        self.take_ss=Timer_ss(self,plugin2)
+
         
 
 
@@ -195,10 +207,11 @@ class Timer_activeWindow(wx.Timer):
         self.Start(5000)
 
 class Timer_ss(wx.Timer):
-    def __init__(self,parent : MyPanel):
+    def __init__(self,parent : MyPanel , plugin):
         super().__init__(parent)
 
-        parent.Bind(wx.EVT_TIMER,screenshot,self)
+        parent.Bind(wx.EVT_TIMER,plugin.screenshot, self)
+        # parent.Bind(wx.EVT_TIMER,screenshot,self)
         self.Start(5000)        
         
 class MyFrame(wx.Frame):

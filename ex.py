@@ -1,25 +1,18 @@
-import wx
+import wx 
+import wx.html2 
 
-class MainWindow(wx.Frame):
-    def __init__(self, parent, title):
-        wx.Frame.__init__(self, parent, title=title, size=(200,100))
-        self.control = wx.TextCtrl(self, style=wx.TE_MULTILINE)
-        self.CreateStatusBar() # A Statusbar in the bottom of the window
+class MyBrowser(wx.Dialog): 
+  def __init__(self, *args, **kwds): 
+    wx.Dialog.__init__(self, *args, **kwds) 
+    sizer = wx.BoxSizer(wx.VERTICAL) 
+    self.browser = wx.html2.WebView.New(self) 
+    sizer.Add(self.browser, 1, wx.EXPAND, 10) 
+    self.SetSizer(sizer) 
+    self.SetSize((700, 700)) 
 
-        # Setting up the menu.
-        filemenu= wx.Menu()
-
-        # wx.ID_ABOUT and wx.ID_EXIT are standard IDs provided by wxWidgets.
-        filemenu.Append(wx.ID_ABOUT, "&About"," Information about this program")
-        filemenu.AppendSeparator()
-        filemenu.Append(wx.ID_EXIT,"E&xit"," Terminate the program")
-
-        # Creating the menubar.
-        menuBar = wx.MenuBar()
-        menuBar.Append(filemenu,"&File") # Adding the "filemenu" to the MenuBar
-        self.SetMenuBar(menuBar)  # Adding the MenuBar to the Frame content.
-        self.Show(True)
-
-app = wx.App(False)
-frame = MainWindow(None, "Sample editor")
-app.MainLoop()
+if __name__ == '__main__': 
+  app = wx.App() 
+  dialog = MyBrowser(None, -1) 
+  dialog.browser.LoadURL("http://www.google.com") 
+  dialog.Show() 
+  app.MainLoop()

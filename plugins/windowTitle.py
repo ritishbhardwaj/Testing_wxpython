@@ -11,5 +11,5 @@ def collect_activeWindows(event):
     # aawnd = pyg.getWindowsWithTitle(window)
     # print(aawnd[0]._hWnd,'-=-=-=-=-=-=-=-=-=-=-=')
     # print(window,'-----=-=-=-=-=-=-=-=-=-=-=')
-    print(window)
+    print('window==========>',window)
     # logger.info(f" active window of user - {window}")

@@ -74,7 +74,7 @@ def find_address_bar(root, text):
 
 def parse_url(obj, ignored_text=[]):
     #print (obj)
-    url = obj.get_text(0, -1).strip()
+    url:str = obj.get_text(0, -1).strip()
 
     if url is None:
         return ''
@@ -100,7 +100,7 @@ def get_url(app_list):
     # Iterate through all desktops
     for index in range(pyatspi.Registry.getDesktopCount()):
         desktop = pyatspi.Registry.getDesktop(index)
-        # print(desktop)
+        print(desktop)
         for app_name, address_name in app_list:
             #print("appname ",app_name)
             #print("address_name ",address_name)
